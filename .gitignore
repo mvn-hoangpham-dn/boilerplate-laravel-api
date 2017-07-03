@@ -1,0 +1,16 @@
+/vendor
+/node_modules
+/public/storage
+/.idea
+Homestead.yaml
+Homestead.json
+.env
+nbproject/
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+#phpunit coverage.clover
+coverage.clover
+public/assets/phpunit-coverage
+laradock/logs/
