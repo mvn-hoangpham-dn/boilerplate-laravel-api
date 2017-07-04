@@ -1,5 +1,5 @@
 ## Overview
-AT-boilerplate-laravel-web provides you with a massive head start on any size web application. We have put a lot of work into it and we hope it serves you well and saves you time!
+AT-boilerplate-laravel-api provides you with a massive head start on any size web application. We have put a lot of work into it and we hope it serves you well and saves you time!
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
@@ -13,7 +13,7 @@ AT-boilerplate-laravel-web provides you with a massive head start on any size we
     - [Create Database](#create-database)
     - [Artisan Commands](#artisan-commands)
     - [PHPUnit](#phpunit)
-    - [Login](#login)
+- [API document](#api-document)
 - [Resources](#resources)
     - [Version](#version)
     - [From the Source](#from-the-source)
@@ -38,6 +38,7 @@ However, if you are not using Homestead, you will need to make sure your server 
 - Client code middleware
 - Repository pattern
 - Service pattern
+- API document
 
 ## Packages
 | Name        | Description           | Version  |
@@ -123,17 +124,36 @@ phpunit
 
 You will see a dot(.) appear for each of the hundreds of tests, and then be provided with the amount of passing tests at the end. There should be no failures with a fresh install.
 
-### Login
-After your project is installed and you can access it in a browser, click the login button on the right of the navigation bar.
-
-The administrator credentials are:
-
+## API document
+### Library
+[Flatdoc](http://ricostacruz.com/flatdoc/) is a small JavaScript file that fetches Markdown files and renders them as full pages. Essentially, it’s the easiest way to make open source documentation from Readme files.
+### Configuration
+##### Routes
+Set config route for api document in directory `routes/web.php`
 ```json
-Username: admin@admin.com
-Password: 23456780
-```
+Route::get('/api-docs', function () {
+    return view('api_docs');
+});
 
-You will be automatically redirected to the backend. If you changed these values in the seeder prior, then obviously use the ones you updated to.
+Route::get('/api-doc-builders', function () {
+    return view('api-doc-builders.index');
+});
+
+```
+##### Views
+View contained in directort `resources/views/api-doc-builders`
+
+##### File implement
+Files implement contained in directory `docs/api-references`
+
+##### Usage
+To create new api document, we will flow by steps:
+In directory `docs/api-references` create new file `user.md` and implement document by markdown format.
+
+To include file `user.md`, you will go to file `resources/views/api-doc-builders/index.blade.php`
+
+Refresh browser to update api document page.
+
 
 ## Resources
 ### Version
@@ -145,6 +165,10 @@ You will be automatically redirected to the backend. If you changed these values
 
 ### Directory Structure
 - [Laravel sourcesource structure](https://laravel.com/docs/5.4/structure)
+
+## Screenshots
+##### API document page
+![Screenshot](https://github.com/AsianTechInc/AT-boilerplate-laravel-api/tree/master/public/screenshots/api_document_page.png)
 
 ## What's Next?
 At this point you have all that you need, you can browse the code base and build the rest of your application the way you normally would.
