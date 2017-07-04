@@ -18,6 +18,7 @@ AT-boilerplate-laravel-api provides you with a massive head start on any size we
     - [Version](#version)
     - [From the Source](#from-the-source)
     - [Directory Structure](#directory-structure)
+- [Screenshots](#screenshots)
 - [What's Next?](#whats-next)
 - [Contributing](#contributing)
 
