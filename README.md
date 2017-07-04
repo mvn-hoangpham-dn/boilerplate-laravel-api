@@ -125,11 +125,15 @@ phpunit
 You will see a dot(.) appear for each of the hundreds of tests, and then be provided with the amount of passing tests at the end. There should be no failures with a fresh install.
 
 ## API document
+
 ### Library
 [Flatdoc](http://ricostacruz.com/flatdoc/) is a small JavaScript file that fetches Markdown files and renders them as full pages. Essentially, it’s the easiest way to make open source documentation from Readme files.
+
 ### Configuration
-##### Routes
+
+#### Routes
 Set config route for api document in directory `routes/web.php`
+
 ```json
 Route::get('/api-docs', function () {
     return view('api_docs');
@@ -140,13 +144,13 @@ Route::get('/api-doc-builders', function () {
 });
 
 ```
-##### Views
+#### Views
 View contained in directort `resources/views/api-doc-builders`
 
-##### File implement
+#### File implement
 Files implement contained in directory `docs/api-references`
 
-##### Usage
+#### Usage
 To create new api document, we will flow by steps:
 In directory `docs/api-references` create new file `user.md` and implement document by markdown format.
 
@@ -168,7 +172,7 @@ Refresh browser to update api document page.
 
 ## Screenshots
 ##### API document page
-![Screenshot](https://github.com/AsianTechInc/AT-boilerplate-laravel-api/tree/master/public/screenshots/api_document_page.png)
+![API document page](https://raw.githubusercontent.com/AsianTechInc/AT-boilerplate-laravel-api/master/public/screenshots/api_document_page.png?token=APZYyW5wXrRXNjvmciUy0J91nE_DFIyaks5ZZCoPwA%3D%3D)
 
 ## What's Next?
 At this point you have all that you need, you can browse the code base and build the rest of your application the way you normally would.
