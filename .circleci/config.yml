@@ -16,7 +16,7 @@ references:
   primary_container: &primary_container
     docker:
       - image: circleci/php:8.0-node-browsers-legacy
-    working_directory: ~/unicharm
+    working_directory: ~/boilerplate
 
   test_and_build_container: &test_and_build_container
     docker:
@@ -28,7 +28,7 @@ references:
           POSTGRES_USER: forge
           POSTGRES_PASSWORD: forge
           TZ: Asia/Tokyo
-    working_directory: ~/unicharm
+    working_directory: ~/boilerplate
 
   deploy_to_aws: &deploy_to_aws
     deploy:
@@ -237,7 +237,7 @@ jobs:
 
 workflows:
   version: 2
-  unicharm_workflow:
+  boilerplate_workflow:
     jobs:
       - test_and_build:
           filters:
