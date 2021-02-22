@@ -5,10 +5,12 @@ CircleCI for auto deploying to AWS
 - [Environments](#environments)
 - [Getting started](#getting-started)
     - [Prepare](#prepare)
-    - [ECS](#fork)
-    - [EC2](#migrating)
+    - [Steps](#steps)
+        - [ECS](#ecs)
+        - [EC2](#ec2)
 
 ## Environments
+
 | Branch          | Environment |
 | --------------- | ----------- |
 | feature/sprintX | Dev         |
@@ -17,8 +19,10 @@ CircleCI for auto deploying to AWS
 
 ## Getting started
 ### Prepare (Its Infra's team task)
+- AWS deployment account: (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
 - Environment variables (normally located at .env) should be stored at [AWS System Managers](https://ap-northeast-1.console.aws.amazon.com/systems-manager/parameters/?region=ap-northeast-1&tab=Table) by `terraform`.
 - AWS for each Environments:
+
 | env                      | Environment | name                         |
 | ------------------------ | ----------- | ---------------------------- |
 | AWS_ACCOUNT_ID           | DEV         | AWS_ACCOUNT_ID_DEV           |
@@ -32,9 +36,10 @@ CircleCI for auto deploying to AWS
 | AWS_KMS                  | PRD         | AWS_KMS_PRD                  |
 | AWS_ACCESS_KEY_ID        |             | AWS_ACCESS_KEY_ID            |
 | AWS_SECRET_ACCESS_KEY    |             | AWS_SECRET_ACCESS_KEY        |
+
+- AWS_KMS could be collect at [KMS Console](https://ap-northeast-1.console.aws.amazon.com/kms/home?region=ap-northeast-1#/kms/keys)
 - AWS Role for deployment
     - Attach AWS_IAM_ROLE_EXTERNAL_ID to Trust Relationship of this role.
-
 
 ### Steps
 - Assume Role: `ops/assume.sh`
