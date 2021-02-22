@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -10,16 +12,6 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/api-docs', function () {
-    return view('api_docs');
-});
-
-Route::get('/api-doc-builders', function () {
-    return view('api-doc-builders.index');
-});
-
-Auth::routes();
 
 Route::get('/', function () {
     return view('welcome');
