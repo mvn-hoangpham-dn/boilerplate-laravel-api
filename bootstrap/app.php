@@ -15,6 +15,9 @@ $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );
 
+// change app to core
+$app->useAppPath(realpath(__DIR__ . '/../core'));
+
 /*
 |--------------------------------------------------------------------------
 | Bind Important Interfaces
