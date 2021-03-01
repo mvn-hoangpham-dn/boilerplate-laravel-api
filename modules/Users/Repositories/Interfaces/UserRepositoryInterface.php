@@ -3,6 +3,7 @@
 namespace Modules\Users\Repositories\Interfaces;
 
 use Modules\Users\Http\Requests\ListUserRequest;
+use Modules\Users\Http\Requests\RegisterUserRequest;
 
 /**
  * UserRepositoryInterface interface
@@ -24,4 +25,13 @@ interface UserRepositoryInterface
      * @return Collection
      */
     public function list(ListUserRequest $request);
+
+    /**
+     * Register function
+     *
+     * @param RegisterUserRequest $request request
+     *
+     * @return Collection
+     */
+    public function register(RegisterUserRequest $request);
 }

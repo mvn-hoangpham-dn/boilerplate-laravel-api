@@ -13,4 +13,5 @@ $routeGroup = [
 
 Route::group($routeGroup, function () {
     Route::get('/', 'UserController@list')->name('list');
+    Route::post('/register', 'UserController@register')->name('register');
 });

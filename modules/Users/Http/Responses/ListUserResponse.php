@@ -17,7 +17,6 @@ class ListUserResponse extends JsonResource
      */
     public function toArray($request)
     {
-        dd($this);
         return [
            'id'        => (int) $this->id,
         ];
