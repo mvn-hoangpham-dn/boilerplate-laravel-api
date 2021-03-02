@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <ruleset name="Monstar-lab PHP Coding Standard">
     <!-- Default directory to check if there are no directories argurment  -->
-    <file>app</file>
+    <file>core</file>
     <file>resources</file>
 
     <!-- Add PSR1 standard -->
