@@ -1,0 +1,171 @@
+
+   Predis\Connection\ConnectionException 
+
+  Error while reading line from the server. [tcp://redis:6379]
+
+  at /var/www/vendor/predis/predis/src/Connection/AbstractConnection.php:155
+
+   Predis\Connection\ConnectionException 
+
+  Error while reading line from the server. [tcp://redis:6379]
+
+  at /var/www/vendor/predis/predis/src/Connection/AbstractConnection.php:155
+    151|      */
+    152|     protected function onConnectionError($message, $code = null)
+    153|     {
+    154|         CommunicationException::handle(
+  > 155|             new ConnectionException($this, static::createExceptionMessage($message), $code)
+    156|         );
+    157|     }
+    158| 
+    159|     /**
+    151|      */
+    152|     protected function onConnectionError($message, $code = null)
+    153|     {
+    154|         CommunicationException::handle(
+  > 155|             new ConnectionException($this, static::createExceptionMessage($message), $code)
+    156|         );
+    157|     }
+    158| 
+    159|     /**
+
+      [2m+28 vendor frames [22m
+      [2m+28 vendor frames [22m
+  29  /var/www/artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+  29  /var/www/artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+   Predis\Connection\ConnectionException 
+
+  Error while reading line from the server. [tcp://redis:6379]
+
+  at /var/www/vendor/predis/predis/src/Connection/AbstractConnection.php:155
+    151|      */
+    152|     protected function onConnectionError($message, $code = null)
+    153|     {
+    154|         CommunicationException::handle(
+  > 155|             new ConnectionException($this, static::createExceptionMessage($message), $code)
+    156|         );
+    157|     }
+    158| 
+    159|     /**
+
+      [2m+28 vendor frames [22m
+  29  /var/www/artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+   Predis\Connection\ConnectionException 
+
+  Error while reading line from the server. [tcp://redis:6379]
+
+  at /var/www/vendor/predis/predis/src/Connection/AbstractConnection.php:155
+    151|      */
+    152|     protected function onConnectionError($message, $code = null)
+    153|     {
+    154|         CommunicationException::handle(
+  > 155|             new ConnectionException($this, static::createExceptionMessage($message), $code)
+    156|         );
+    157|     }
+    158| 
+    159|     /**
+
+      [2m+28 vendor frames [22m
+  29  /var/www/artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+   Predis\Connection\ConnectionException 
+
+  Connection refused [tcp://redis:6379]
+
+  at /var/www/vendor/predis/predis/src/Connection/AbstractConnection.php:155
+    151|      */
+    152|     protected function onConnectionError($message, $code = null)
+    153|     {
+    154|         CommunicationException::handle(
+  > 155|             new ConnectionException($this, static::createExceptionMessage($message), $code)
+    156|         );
+    157|     }
+    158| 
+    159|     /**
+
+      [2m+32 vendor frames [22m
+  33  /var/www/artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+   Predis\Connection\ConnectionException 
+
+  Error while reading line from the server. [tcp://redis:6379]
+
+  at /var/www/vendor/predis/predis/src/Connection/AbstractConnection.php:155
+    151|      */
+    152|     protected function onConnectionError($message, $code = null)
+    153|     {
+    154|         CommunicationException::handle(
+  > 155|             new ConnectionException($this, static::createExceptionMessage($message), $code)
+    156|         );
+    157|     }
+    158| 
+    159|     /**
+
+      [2m+28 vendor frames [22m
+  29  /var/www/artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+   Predis\Connection\ConnectionException 
+
+  Error while reading line from the server. [tcp://redis:6379]
+
+  at /var/www/vendor/predis/predis/src/Connection/AbstractConnection.php:155
+    151|      */
+    152|     protected function onConnectionError($message, $code = null)
+    153|     {
+    154|         CommunicationException::handle(
+  > 155|             new ConnectionException($this, static::createExceptionMessage($message), $code)
+    156|         );
+    157|     }
+    158| 
+    159|     /**
+
+      [2m+28 vendor frames [22m
+  29  /var/www/artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+   Predis\Connection\ConnectionException 
+
+  Error while reading line from the server. [tcp://redis:6379]
+
+  at /var/www/vendor/predis/predis/src/Connection/AbstractConnection.php:155
+    151|      */
+    152|     protected function onConnectionError($message, $code = null)
+    153|     {
+    154|         CommunicationException::handle(
+  > 155|             new ConnectionException($this, static::createExceptionMessage($message), $code)
+    156|         );
+    157|     }
+    158| 
+    159|     /**
+
+      [2m+28 vendor frames [22m
+  29  /var/www/artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
+
+   Predis\Connection\ConnectionException 
+
+  Error while reading line from the server. [tcp://redis:6379]
+
+  at /var/www/vendor/predis/predis/src/Connection/AbstractConnection.php:155
+    151|      */
+    152|     protected function onConnectionError($message, $code = null)
+    153|     {
+    154|         CommunicationException::handle(
+  > 155|             new ConnectionException($this, static::createExceptionMessage($message), $code)
+    156|         );
+    157|     }
+    158| 
+    159|     /**
+
+      [2m+28 vendor frames [22m
+  29  /var/www/artisan:37
+      Illuminate\Foundation\Console\Kernel::handle(Object(Symfony\Component\Console\Input\ArgvInput), Object(Symfony\Component\Console\Output\ConsoleOutput))
