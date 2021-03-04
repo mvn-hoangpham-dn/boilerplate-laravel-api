@@ -17,7 +17,7 @@ class Kernel extends HttpKernel
         // \Core\Http\Middleware\TrustHosts::class,
         \Core\Http\Middleware\TrustProxies::class,
         \Fruitcake\Cors\HandleCors::class,
-        \Core\Http\Middleware\PreventRequestsDuringMaintenance::class,
+        // \Core\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \Core\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
