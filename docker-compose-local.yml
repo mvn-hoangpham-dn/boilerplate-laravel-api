@@ -34,7 +34,10 @@ services:
     links:
       - db
       - redis
+      - elasticsearch
     container_name: boilerplate-proxy-php-cont
+    networks:
+      - elk
   db:
     image: boilerplate/db-local:latest
     restart: always
@@ -49,6 +52,8 @@ services:
       TZ: Asia/Tokyo
       PG_DATA: /var/lib/postgresql/data/pgdata
     container_name: boilerplate-db-cont
+    networks:
+      - elk
   redis:
     image: "redis:alpine"
     ports:
@@ -58,6 +63,8 @@ services:
     environment:
      - REDIS_REPLICATION_MODE=master
     container_name: boilerplate-cache-cont
+    networks:
+      - elk
   elasticsearch:
     build:
       context: elk/elasticsearch/

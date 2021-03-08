@@ -1,5 +1,6 @@
 <?php
 
+use Core\Models\Book;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder

@@ -1,8 +1,5 @@
 <?php
 
-$elasticsearch_host = env('ELASTICSEARCH_HOST', 'localhost');
-$elasticsearch_port = env('ELASTICSEARCH_PORT', '9200');
-
 return array(
 
     /*
@@ -17,7 +14,7 @@ return array(
     */
 
     'config' => [
-        'hosts'     => [ "{$elasticsearch_host}:{$elasticsearch_port}" ],
+        'hosts'     => ["elasticsearch:9200"],
         'retries'   => 1,
     ],
 
