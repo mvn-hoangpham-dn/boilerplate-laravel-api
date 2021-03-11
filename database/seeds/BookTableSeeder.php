@@ -1,7 +1,7 @@
 <?php
 
-use Core\Models\Book;
 use Illuminate\Database\Seeder;
+use Modules\ElasticSearch\Models\Book as ModelsBook;
 
 class BookTableSeeder extends Seeder
 {
@@ -12,6 +12,6 @@ class BookTableSeeder extends Seeder
      */
     public function run()
     {
-        return factory(Book::class, 10)->create();
+        return factory(ModelsBook::class, 50)->create();
     }
 }

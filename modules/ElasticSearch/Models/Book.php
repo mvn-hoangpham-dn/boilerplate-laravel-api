@@ -1,15 +1,24 @@
 <?php
 
-namespace Core\Models;
+namespace Modules\ElasticSearch\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Elasticquent\ElasticquentTrait;
+use Illuminate\Database\Eloquent\Model;
 
 class Book extends Model
 {
     use ElasticquentTrait;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'books';
+
+    protected $fillable = [
+        //
+    ];
 
     /**
      * The elasticsearch settings.
@@ -55,11 +64,21 @@ class Book extends Model
         ],
     ];
 
+    /**
+     * GetIndexName function
+     *
+     * @return string
+     */
     function getIndexName()
     {
         return 'books';
     }
 
+    /**
+     * GetTypeName function
+     *
+     * @return string
+     */
     function getTypeName()
     {
         return 'books';
