@@ -39,10 +39,10 @@ COMMIT_SHA1=$(shell git rev-parse HEAD)
 ENVIRONMENT=$(env)
 
 #Docker Image Version
-# php 7.3, nginx 1.19.6
+# php 7.3, nginx 1.19.7
 #Docker Image Version
 PHP_TAG=phpdockerio/php73-fpm:latest
-HTTPD_TAG=nginx:1.19.6-alpine
+HTTPD_TAG=nginx:1.19.7-alpine
 DB_TAG=postgres:11.5
 
 # Wokdir
