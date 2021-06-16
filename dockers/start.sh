@@ -2,16 +2,11 @@
 php artisan config:cache
 composer self-update --2
 composer install --no-interaction
-npm install
 composer dump-autoload --optimize
-php artisan migrate
+php artisan migrate --force
 php artisan route:cache
-service php7.3-fpm restart
+service php7.3-fpm stop
 service supervisor start
-supervisorctl reread
-supervisorctl update
-# supervisorctl start laravel-worker:*
-crond -l 2 -b
-service ssh start
 chmod -R 777 storage/
-nginx -g 'daemon off;'
+nginx
+/usr/sbin/php-fpm7.3 -O

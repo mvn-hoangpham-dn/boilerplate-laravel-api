@@ -1,10 +1,8 @@
-version: '2.0'
+version: '3.8'
 volumes:
     data-vol: # Volume to host db service data locally.
       driver: local
     php_dependencies: # Volume to cache vendor locally.
-      driver: local
-    npm_dependencies: # Volume to cache node_modules locally.
       driver: local
 services:
   proxy-app:
@@ -16,14 +14,23 @@ services:
         IMAGE_NAME: boilerplate/proxy-php-base-local
         ENV: local
         PORT: 80
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1024M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
     volumes:
       - ./:/var/www
       - ./environments/.env.local:/var/www/.env
       - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
-      - ./dockers/laravel-worker.conf:/etc/supervisor/conf.d/laravel-worker.conf
+      - ./supervisor/conf.d/laravel-worker.conf:/etc/supervisor/conf.d/laravel-worker.conf
       # To avoid syncing the vendor directory
       - php_dependencies:/var/www/vendor
-      - npm_dependencies:/var/www/node_modules
+    environment:
+      COMPOSER_ALLOW_SUPERUSER: 1
     ports:
       - "80:80"
     links:
@@ -33,16 +40,16 @@ services:
   db:
     image: boilerplate/db-local:latest
     restart: always
+    command: --default-authentication-plugin=mysql_native_password
     ports:
-        - "5432:5432" # host:container
+        - "3306:3306" # host:container
     volumes:
-      - data-vol:/var/lib/postgresql/data
+      - data-vol:/var/lib/mysql
     environment:
-      POSTGRES_DB: forge
-      POSTGRES_USER: forge
-      POSTGRES_PASSWORD: forge
-      TZ: Asia/Tokyo
-      PG_DATA: /var/lib/postgresql/data/pgdata
+      MYSQL_DATABASE: boilerplate
+      MYSQL_USER: boilerplate
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
     container_name: boilerplate-db-cont
   redis:
     image: "redis:alpine"
@@ -53,3 +60,12 @@ services:
     environment:
      - REDIS_REPLICATION_MODE=master
     container_name: boilerplate-cache-cont
+  docs:
+    image: "volbrene/redoc"
+    ports:
+     - "8080:80"
+    volumes:
+     - $PWD/apidocs:/var/www/html/static/swagger-files
+    environment:
+     - "URLS=[{url: '/static/swagger-files/openapi.yaml', name: 'BoilerplateAPI'}]"
+    container_name: boilerplate-docs-cont

@@ -37,6 +37,9 @@ Fork This repository
 
 ### Migrating
 ```
+If you're make app on Mac M1:
+- export DOCKER_BUILDKIT=0
+Continue:
 - make all-images env=local
 - make up-all env=local
 ```
@@ -52,7 +55,7 @@ Fork This repository
 - [Laravel Documentation](https://laravel.com/docs/8.x)
 
 ### Directory Structure
-- HMVC
+- HMVC/Clean Architecture
 
 ## Autodeploy
 - [Autodeploy using circleCI](https://github.com/monstar-lab-consulting/boilerplate-laravel-api/blob/master/ops/README.md)

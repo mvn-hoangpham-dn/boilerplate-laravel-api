@@ -16,7 +16,7 @@ else
 endif
 
 # get argument(database open port)
-DB_PORT=5432
+DB_PORT=3306
 ifdef database_open_port
 	DB_PORT_OPTION=-p $(database_open_port):$(DB_PORT)
 else
@@ -39,11 +39,11 @@ COMMIT_SHA1=$(shell git rev-parse HEAD)
 ENVIRONMENT=$(env)
 
 #Docker Image Version
-# php 7.3, nginx 1.19.7
+# php 8.0, nginx 1.19.7
 #Docker Image Version
 PHP_TAG=phpdockerio/php73-fpm:latest
 HTTPD_TAG=nginx:1.19.7-alpine
-DB_TAG=postgres:11.5
+DB_TAG=mysql:8.0.24
 
 # Wokdir
 WORK_DIR=/var/www/
@@ -66,7 +66,7 @@ base-image:
 
 db-image:
 	echo ":::Building db image"
-	docker build --rm -f dockers/DB.Dockerfile $(BUILD_DB_ARGS) -t $(DB_IMAGE_NAME) .
+	docker build --rm -f dockers/DB.Dockerfile --platform=linux/x86_64 $(BUILD_DB_ARGS) -t $(DB_IMAGE_NAME) .
 #Remove all images
 rm-all-images:
 	@echo ":::remove all images"
@@ -75,7 +75,7 @@ rm-all-images:
 #Up with rebuild
 up-all:
 	@echo ":::up all container"
-	-docker-compose -f docker-compose-$(ENVIRONMENT).yml up  -d --force-recreate --build
+	-docker-compose -f docker-compose-$(ENVIRONMENT).yml up  -d --build
 
 #Up
 up:
@@ -100,3 +100,15 @@ rm-all-vol:
 rebuild-nocache:
 	@echo ":::rebuild all image with no cache"
 	-docker-compose -f docker-compose-$(ENVIRONMENT).yml build --no-cache
+
+
+kubedeploy:
+	@echo ":::create secret keys"
+	kubectl create secret generic boilerplate-secrets --from-env-file=environments/.env.kubernetes --dry-run=client
+	kubectl create secret generic boilerplate-secrets --from-env-file=environments/.env.kubernetes
+	@echo ":::build pod"
+	kubectl apply -f kubernetes/deployment.yaml
+
+
+# kubectl delete service boilerplate-service
+# kubectl delete deploy boilerplate-app-deployment

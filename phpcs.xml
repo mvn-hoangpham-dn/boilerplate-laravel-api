@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Monstar-lab PHP Coding Standard">
+<ruleset name="Monstarlab PHP Coding Standard">
     <!-- Default directory to check if there are no directories argurment  -->
     <file>core</file>
     <file>resources</file>
