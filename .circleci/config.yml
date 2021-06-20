@@ -1,7 +1,8 @@
 version: 2.1
 
 orbs:
-  aws-cli: circleci/aws-cli@0.1.13
+  aws-ecr: circleci/aws-ecr@6.15.3
+  aws-ecs: circleci/aws-ecs@2.1.0
 
 references:
   php_environment: &php_environment
@@ -10,9 +11,9 @@ references:
       APP_ENV: testing
       APP_DEBUG: true
       APP_KEY: base64:hA7ZAU1am16HSOWo2a4SCTVmByyOQBj9X0KV4JucuD4=
-      DB_DATABASE: forge
-      DB_USERNAME: forge
-      DB_PASSWORD: forge
+      DB_DATABASE: boilerplate
+      DB_USERNAME: boilerplate
+      DB_PASSWORD: password
   primary_container: &primary_container
     docker:
       - image: circleci/php:8.0-node-browsers-legacy
@@ -22,38 +23,17 @@ references:
     docker:
       - image: circleci/php:8.0-node-browsers-legacy
         <<: *php_environment
-      - image: postgres:11.5
+      - image: circleci/mysql:8.0.23
         environment:
-          POSTGRES_DB: forge
-          POSTGRES_USER: forge
-          POSTGRES_PASSWORD: forge
-          TZ: Asia/Tokyo
+          MYSQL_DATABASE: boilerplate
+          MYSQL_USER: boilerplate
+          MYSQL_PASSWORD: password
+          MYSQL_ROOT_PASSWORD: password
     working_directory: ~/boilerplate
-
-  deploy_to_aws: &deploy_to_aws
-    deploy:
-      name: Deploy to AWS
-      environment:
-        ECS_CLI_VER: v1.16.0
-      command: |
-        set -x
-        [[ -f "aws-envs.sh" ]] && source aws-envs.sh
-        ./ops/deploy.sh
-      no_output_timeout: 30m
 
   setup_specific_docker: &setup_specific_docker
     setup_remote_docker:
       version: 18.09.3
-
-  # handle docker images
-  operate_docker_image: &operate_docker_image
-    run:
-      name: Operate Docker image
-      command: |
-        set -x
-
-        [[ -f "aws-envs.sh" ]] && source aws-envs.sh
-        ./ops/push.sh
   # composer cache
   # restore dependencies cache
   restore_composer_dependencies_cache: &restore_composer_dependencies_cache
@@ -66,19 +46,6 @@ references:
       key: v1-dependencies-{{ checksum "composer.json" }}-{{ checksum "composer.lock" }}
       paths:
         - vendor
-
-  # node cache
-  # restore dependencies cache
-  restore_node_dependencies_cache: &restore_node_dependencies_cache
-    restore_cache:
-      key: v1-dependencies-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
-
-  # save dependencies cache
-  save_node_dependencies_cache: &save_node_dependencies_cache
-    save_cache:
-      key: v1-dependencies-{{ checksum "package.json" }}-{{ checksum "package-lock.json" }}
-      paths:
-        - node_modules
 
   # security-checker cache
   # restore security checker
@@ -112,29 +79,10 @@ references:
         set -x
         sudo apt-get update -y
         sudo apt-get install -y libpq-dev
-        sudo docker-php-ext-install pdo pdo_pgsql
+        sudo docker-php-ext-install pdo pdo_mysql
         composer dump-autoload -o
         php artisan config:cache
         php artisan migrate --seed
-
-  install_aws_cli: &install_aws_cli
-    run:
-      name: Install AWS CLI
-      environment:
-        AWS_CLI_VER: 1.16.297
-      command: |
-        set -x
-        sudo apt-get update -y
-        sudo apt-get install -y python-pip
-        sudo pip install awscli=="${AWS_CLI_VER}"
-
-  assume_role_and_save_credentials: &assume_role_and_save_credentials
-    run:
-      name: Assume role and save credentials
-      command: |
-        set -x
-
-        ./ops/assume.sh
 
 jobs:
   test_and_build:
@@ -144,7 +92,6 @@ jobs:
       - <<: *setup_specific_docker
       - run: cp environments/.env.testing .env
       - <<: *restore_composer_dependencies_cache
-      - <<: *restore_node_dependencies_cache
       - run:
           name: Install dependencies
           command: |
@@ -154,11 +101,7 @@ jobs:
               sudo composer self-update --2
               composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader --ignore-platform-reqs
             fi
-            if [[ ! -d node_modules ]]; then
-              npm install
-            fi
       - <<: *save_composer_dependencies_cache
-      - <<: *save_node_dependencies_cache
       - run:
           name: Test phplint
           command: |
@@ -177,64 +120,10 @@ jobs:
             set -x
             ./vendor/bin/phpcs --standard=phpcs.xml --extensions=php --exclude=Generic.Files.LineLength --ignore=core/Support/helpers.php core
             echo "TODO: Run phpcs"
-      - run:
-          name: Test npmlint
-          command: |
-            set -x
-            npm run lint
-            echo "TODO: Run npmlint"
       - <<: *restore_composer_security_checker
       - <<: *checking_composer_dependencies_security
       - <<: *save_composer_security_checker
       - <<: *prepare_db
-      - run:
-          name: Test unit
-          command: |
-            set -x
-            ./vendor/bin/phpunit
-            echo "TODO: do unit testing here"
-      - store_test_results:
-          path: tests/_output
-      - store_artifacts:
-          path: tests/_output
-      # - <<: *operate_docker_image
-
-  deploy:
-    parameters:
-      production:
-        type: boolean
-        default: false
-    <<: *primary_container
-    steps:
-      - checkout
-      - <<: *setup_specific_docker
-      - <<: *restore_composer_security_checker
-      - run:
-          name: Install dependencies
-          command: |
-            set -x
-            if [[ ! -d vendor ]]; then
-              sudo docker-php-ext-install sockets
-              composer install --no-interaction --no-progress --prefer-dist --optimize-autoloader --ignore-platform-reqs
-            fi
-      - <<: *save_composer_dependencies_cache
-      - <<: *install_aws_cli
-      - when:
-          condition: <<parameters.production>>
-          steps:
-            - run:
-                name: Assume role and save credentials for production
-                command: |
-                  set -x
-
-                  ./ops/assume.sh -p
-      - unless:
-          condition: <<parameters.production>>
-          steps:
-            - <<: *assume_role_and_save_credentials
-      - <<: *operate_docker_image
-      - <<: *deploy_to_aws
-
 workflows:
   version: 2
   boilerplate_workflow:
@@ -247,48 +136,123 @@ workflows:
             tags:
               ignore:
                 - /.*/
-      - deploy:
-          name: deploy_on_dev
+      
+      - aws-ecr/build-and-push-image:
+              name: 'stg-build-and-push-base-image'
+              filters:
+                branches:
+                  only:
+                    - staging-base
+              requires:
+                - test_and_build
+              account-url: AWS_ECR_ACCOUNT_URL
+              aws-access-key-id: AWS_ACCESS_KEY_ID
+              aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+              dockerfile: ./dockers/Base.Dockerfile
+              path: .
+              region: AWS_REGION
+              repo: 'AWS_ECR_STG'
+              tag: "base"
+      
+      - aws-ecr/build-and-push-image:
+              name: 'prod-build-and-push-base-image'
+              filters:
+                branches:
+                  only:
+                    - production-base
+              requires:
+                - test_and_build
+              account-url: AWS_ECR_ACCOUNT_URL
+              aws-access-key-id: AWS_ACCESS_KEY_ID
+              aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+              dockerfile: ./dockers/Base.Dockerfile
+              path: .
+              region: AWS_REGION
+              repo: 'AWS_ECR_PROD'
+              tag: "base"
+
+      - aws-ecr/build-and-push-image:
+              name: 'stg-build-and-push'
+              filters:
+                branches:
+                  only:
+                    - staging
+                    - staging-debug
+              requires:
+                - test_and_build
+              account-url: AWS_ECR_ACCOUNT_URL
+              aws-access-key-id: AWS_ACCESS_KEY_ID
+              aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+              dockerfile: ./dockers/Dockerfile
+              path: .
+              extra-build-args: '--build-arg IMAGE_NAME=${AWS_ECR_ACCOUNT_URL}/${AWS_ECR_STG} --build-arg BASE_TAG=base --build-arg PORT=80'
+              region: AWS_REGION
+              repo: 'AWS_ECR_STG'
+              tag: "$CIRCLE_SHA1"
+
+      - are-you-sure-prod:
+              type: approval
+              requires:
+                - test_and_build
+              filters:
+                branches:
+                  only:
+                    - production
+
+      - aws-ecr/build-and-push-image:
+              name: 'prod-build-and-push'
+              filters:
+                branches:
+                  only:
+                    - production
+              requires:
+                - are-you-sure-prod
+              account-url: AWS_ECR_ACCOUNT_URL
+              aws-access-key-id: AWS_ACCESS_KEY_ID
+              aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+              dockerfile: ./dockers/Dockerfile
+              extra-build-args: '--build-arg IMAGE_NAME=${AWS_ECR_ACCOUNT_URL}/${AWS_ECR_PROD} --build-arg BASE_TAG=base --build-arg PORT=80'
+              path: .
+              region: AWS_REGION
+              repo: 'AWS_ECR_PROD'
+              tag: "$CIRCLE_SHA1"
+      
+      - aws-ecs/deploy-service-update:
+          name: 'stg-service-update'
+          filters:
+            branches:
+              only:
+                - staging
+                - staging-debug
           requires:
-            - test_and_build
-          filters:
-            branches:
-              only:
-                - /^feature\/sprint(\d+)$/
-              ignore:
-                - /.*/
-            tags:
-              only:
-                - /v([0-9]+\.){2}[0-9]+/
-      - deploy:
-          name: deploy_on_stg
-          filters:
-            branches:
-              only:
-                - /develop/
-              ignore:
-                - /.*/
-            tags:
-              only:
-                - /v([0-9]+\.){2}[0-9]+/
-      - approve_deploying_to_prd:
+            - stg-build-and-push
+          aws-region: AWS_REGION
+          cluster-name: 'AWS_CLUSTER_STG'
+          force-new-deployment: true
+          container-image-name-updates: 'container=container,tag=$CIRCLE_SHA1'
+          service-name: 'AWS_SERVICE_STG'
+          family: 'AWS_TASK_STG'
+
+      - are-you-sure-update-prd-service:
           type: approval
           filters:
             branches:
-              ignore:
-                - /.*/
-            tags:
               only:
-                - /v([0-9]+\.){2}[0-9]+/
-      - deploy:
-          name: deploy_on_prd
-          production: true
+                - production
           requires:
-            - approve_deploying_to_prd
+            - prod-build-and-push
+
+      - aws-ecs/deploy-service-update:
+          name: 'prod-service-update'
           filters:
             branches:
-              ignore:
-                - /.*/
-            tags:
               only:
-                - /v([0-9]+\.){2}[0-9]+/
+                - production
+          requires:
+            - are-you-sure-update-prd-service
+          aws-region: AWS_REGION
+          cluster-name: 'AWS_CLUSTER_PROD'
+          force-new-deployment: true
+          container-image-name-updates: 'container=container,tag=$CIRCLE_SHA1'
+          service-name: 'AWS_SERVICE_PROD'
+          family: 'AWS_TASK_PROD'

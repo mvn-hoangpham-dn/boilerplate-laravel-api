@@ -1,5 +1,5 @@
 #!/bin/bash
-php artisan config:cache
+# php artisan config:cache
 composer self-update --2
 composer install --no-interaction
 composer dump-autoload --optimize

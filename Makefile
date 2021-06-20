@@ -37,6 +37,11 @@ COMMIT_SHA1=$(shell git rev-parse HEAD)
 
 # test environment
 ENVIRONMENT=$(env)
+# get argument(database open port)
+ENVIRONMENT=local
+ifdef env
+	ENVIRONMENT=$(env)
+endif
 
 #Docker Image Version
 # php 8.0, nginx 1.19.7
@@ -101,14 +106,59 @@ rebuild-nocache:
 	@echo ":::rebuild all image with no cache"
 	-docker-compose -f docker-compose-$(ENVIRONMENT).yml build --no-cache
 
+KUBE_BASE_IMAGE=172.16.110.67:5000/boilerplate-base
+KUBE_APP_IMAGE=172.16.110.67:5000/boilerplate-app
+KUBE_DB_IMAGE=172.16.110.67:5000/boilerplate-db
+APP_NAME=boilerplate
+
+kubedbimage:
+	@echo ":::build base image"
+	docker build --rm -f dockers/DB.Dockerfile --platform=linux/x86_64 $(BUILD_DB_ARGS) -t $(KUBE_DB_IMAGE) .
+	docker push $(KUBE_DB_IMAGE)
+
+kubebaseimage:
+	@echo ":::build base image"
+	docker build --rm -f dockers/Base.Dockerfile $(BUILD_BASE_ARGS) -t $(KUBE_BASE_IMAGE):$(BASE_TAG) .
+	docker push $(KUBE_BASE_IMAGE)
+
+kubeappimage:
+	@echo ":::build app image"
+	docker build --rm -f dockers/Dockerfile --build-arg IMAGE_NAME=$(KUBE_BASE_IMAGE) --build-arg BASE_TAG=$(BASE_TAG) --build-arg PORT=$(PROXY_PORT) --build-arg ENV=$(ENVIRONMENT) -t $(KUBE_APP_IMAGE):$(BASE_TAG) .
+	docker push $(KUBE_APP_IMAGE)
 
 kubedeploy:
 	@echo ":::create secret keys"
-	kubectl create secret generic boilerplate-secrets --from-env-file=environments/.env.kubernetes --dry-run=client
-	kubectl create secret generic boilerplate-secrets --from-env-file=environments/.env.kubernetes
+	kubectl delete secret $(APP_NAME)-secrets --ignore-not-found
+	kubectl create secret generic $(APP_NAME)-secrets --from-env-file=environments/.env.kubernetes
+	@echo ":::create storage if not exist"
+	kubectl apply -f kubernetes/storage.yaml
 	@echo ":::build pod"
 	kubectl apply -f kubernetes/deployment.yaml
 
+kubeservice:
+	@echo ":::create service"
+	kubectl apply -f kubernetes/service.yaml
+
+kubeimages: kubedbimage kubebaseimage kubeappimage
+
+kubeinit: kubedbimage kubebaseimage kubeappimage kubedeploy kubeservice
+
+kuberollout:
+	@echo "::: rollout"
+	kubectl rollout restart deployment boilerplate-app-deployment
+
+kubeup: kubeappimage kubedeploy kubeservice
+
+kubeupdate: kubeappimage kuberollout
+
+kubedown:
+	@echo ":::delete deployment"
+	kubectl delete secret $(APP_NAME)-secrets --ignore-not-found
+	kubectl delete deploy $(APP_NAME)-app-deployment --ignore-not-found
+	kubectl delete service $(APP_NAME)-service --ignore-not-found
+
+kubedns:
+	kubectl run curl --image=radial/busyboxplus:curl -i --tty
 
 # kubectl delete service boilerplate-service
 # kubectl delete deploy boilerplate-app-deployment

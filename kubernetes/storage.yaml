@@ -1,0 +1,35 @@
+# For use on docker for mac
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: localstorage
+provisioner: docker.io/hostpath
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: boilerplate-pv-volume
+  labels:
+    app: boilerplate-app-deployment
+spec:
+  storageClassName: localstorage
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/boilerplate"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: boilerplate-pv-claim
+  labels:
+    app: boilerplate-app-deployment
+spec:
+  storageClassName: localstorage
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

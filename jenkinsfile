@@ -9,52 +9,47 @@ pipeline {
                 checkout scm
             }
         }
-        stage('local-deploy') {
+        stage('init') {
             when {
-                expression { CHANGE_TARGET ==~ /local_deploy/ }
-            }
-            environment {
-                SSH_CONFIG_NAME="boilerplate"
+                expression { CHANGE_TARGET ==~ /init/ }
             }
             steps {
                 slackSend color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}, refers at: ${env.BUILD_URL}"
                 script {
-                    localDeploy=true
-                    sshPublisher(
-                        continueOnError: false, failOnError: true,
-                        publishers: [
-                            sshPublisherDesc(
-                            configName: "boilerplate",
-                            verbose: true,
-                            transfers: [
-                                sshTransfer(
-                                    execCommand: "cd /home/monstarlab/boilerplate-laravel-api && sudo git fetch origin ${env.CHANGE_BRANCH} && sudo git pull origin ${env.CHANGE_BRANCH} && sudo docker restart boilerplate-proxy-php-cont"
-                                )
-                            ])
-                        ]
-                    )
+                    make kubeinit env=local
+                }
+            }
+        }
+        stage('local-deploy') {
+            when {
+                expression { CHANGE_TARGET ==~ /local_deploy/ }
+            }
+            steps {
+                slackSend color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}, refers at: ${env.BUILD_URL}"
+                script {
+                    make kubeupdate env=local
                 }
             }
         }
     }
-    post {
-        success {
-            script {
-                if (localDeploy) {
-                    slackSend color: "#44F059",
-                            channel: '{channel_name}',
-                            message: "Deployment successfully, please refers functions was deployed at: ${env.CHANGE_URL}"
-                }
-            }
-        }
-        failure {
-            script {
-                if (localDeploy) {
-                    slackSend color: "#F72911",
-                            channel: '{channel_name}', 
-                            message: "Deployment failed, refers logs at: ${env.BUILD_URL}/console"
-                }
-            }
-        }
-    }
+    // post {
+    //     success {
+    //         script {
+    //             if (localDeploy) {
+    //                 slackSend color: "#44F059",
+    //                         channel: '{channel_name}',
+    //                         message: "Deployment successfully, please refers functions was deployed at: ${env.CHANGE_URL}"
+    //             }
+    //         }
+    //     }
+    //     failure {
+    //         script {
+    //             if (localDeploy) {
+    //                 slackSend color: "#F72911",
+    //                         channel: '{channel_name}', 
+    //                         message: "Deployment failed, refers logs at: ${env.BUILD_URL}/console"
+    //             }
+    //         }
+    //     }
+    // }
 }

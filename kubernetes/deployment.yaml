@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: boilerplate-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: boilerplate-app-deployment
+  template:
+    metadata:
+      labels:
+        app: boilerplate-app-deployment
+    spec:
+      containers:
+      - name: boilerplate-proxy-php-cont
+        image: 172.16.110.67:5000/boilerplate-app:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
+        command: ["/bin/sh"]
+        args: ["-c", "/start.sh"]
+        envFrom:
+        - secretRef:
+            name: boilerplate-secrets
+        # volumeMounts:
+        # - name: boilerplate-source
+        #   mountPath: /var/www
+
+      - name: boilerplate-db-cont
+        image: 172.16.110.67:5000/boilerplate-db
+        env:
+        - name: MYSQL_DATABASE
+          value: "boilerplate"
+        - name: MYSQL_USER
+          value: "boilerplate"
+        - name: MYSQL_PASSWORD
+          value: "password"
+        - name: MYSQL_ROOT_PASSWORD
+          value: "password"
+        args:
+          - "--default-authentication-plugin=mysql_native_password"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: boilerplate-db-storage
+          mountPath: /var/lib/mysql
+      - name: boilerplate-cache-cont
+        image: redis:alpine
+        env:
+        - name: REDIS_REPLICATION_MODE
+          value: "master"
+        ports:
+        - containerPort: 6379
+      volumes:
+      - name: boilerplate-db-storage
+        persistentVolumeClaim:
+          claimName: boilerplate-pv-claim
+      # - name: boilerplate-source
+      #   hostPath:
+      #     path: /Users/mbp0041/projects/boilerplate-laravel-api
