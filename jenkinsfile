@@ -16,7 +16,7 @@ pipeline {
             steps {
                 slackSend color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}, refers at: ${env.BUILD_URL}"
                 script {
-                    make kubeinit env=local
+                    sh "make kubeinit env=local"
                 }
             }
         }
@@ -27,7 +27,7 @@ pipeline {
             steps {
                 slackSend color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}, refers at: ${env.BUILD_URL}"
                 script {
-                    make kubeupdate env=local
+                    sh "make kubeupdate env=local"
                 }
             }
         }
