@@ -128,16 +128,16 @@ kubeappimage:
 
 kubedeploy:
 	@echo ":::create secret keys"
-	kubectl delete secret $(APP_NAME)-secrets --ignore-not-found
-	kubectl create secret generic $(APP_NAME)-secrets --from-env-file=environments/.env.kubernetes
+	sudo kubectl delete secret $(APP_NAME)-secrets --ignore-not-found
+	sudo kubectl create secret generic $(APP_NAME)-secrets --from-env-file=environments/.env.kubernetes
 	@echo ":::create storage if not exist"
-	kubectl apply -f kubernetes/storage.yaml
+	sudo kubectl apply -f kubernetes/storage.yaml
 	@echo ":::build pod"
-	kubectl apply -f kubernetes/deployment.yaml
+	sudo kubectl apply -f kubernetes/deployment.yaml
 
 kubeservice:
 	@echo ":::create service"
-	kubectl apply -f kubernetes/service.yaml
+	sudo kubectl apply -f kubernetes/service.yaml
 
 kubeimages: kubedbimage kubebaseimage kubeappimage
 
@@ -145,7 +145,7 @@ kubeinit: kubedbimage kubebaseimage kubeappimage kubedeploy kubeservice
 
 kuberollout:
 	@echo "::: rollout"
-	kubectl rollout restart deployment boilerplate-app-deployment
+	sudo kubectl rollout restart deployment boilerplate-app-deployment
 
 kubeup: kubeappimage kubedeploy kubeservice
 
@@ -153,9 +153,9 @@ kubeupdate: kubeappimage kuberollout
 
 kubedown:
 	@echo ":::delete deployment"
-	kubectl delete secret $(APP_NAME)-secrets --ignore-not-found
-	kubectl delete deploy $(APP_NAME)-app-deployment --ignore-not-found
-	kubectl delete service $(APP_NAME)-service --ignore-not-found
+	sudo kubectl delete secret $(APP_NAME)-secrets --ignore-not-found
+	sudo kubectl delete deploy $(APP_NAME)-app-deployment --ignore-not-found
+	sudo kubectl delete service $(APP_NAME)-service --ignore-not-found
 
 kubedns:
 	kubectl run curl --image=radial/busyboxplus:curl -i --tty
