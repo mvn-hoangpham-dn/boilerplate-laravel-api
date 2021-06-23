@@ -109,6 +109,7 @@ rebuild-nocache:
 KUBE_BASE_IMAGE=172.16.110.67:5000/boilerplate-base
 KUBE_APP_IMAGE=172.16.110.67:5000/boilerplate-app
 KUBE_DB_IMAGE=172.16.110.67:5000/boilerplate-db
+KUBE_CLUSTER=--server=https://172.16.110.59:6443
 APP_NAME=boilerplate
 
 kubedbimage:
@@ -128,16 +129,16 @@ kubeappimage:
 
 kubedeploy:
 	@echo ":::create secret keys"
-	sudo kubectl delete secret $(APP_NAME)-secrets --ignore-not-found
-	sudo kubectl create secret generic $(APP_NAME)-secrets --from-env-file=environments/.env.kubernetes
+	kubectl $(KUBE_CLUSTER) $(KUBE_CLUSTER) delete secret $(APP_NAME)-secrets --ignore-not-found
+	kubectl $(KUBE_CLUSTER) create secret generic $(APP_NAME)-secrets --from-env-file=environments/.env.kubernetes
 	@echo ":::create storage if not exist"
-	sudo kubectl apply -f kubernetes/storage.yaml
+	kubectl $(KUBE_CLUSTER) apply -f kubernetes/storage.yaml
 	@echo ":::build pod"
-	sudo kubectl apply -f kubernetes/deployment.yaml
+	kubectl $(KUBE_CLUSTER) apply -f kubernetes/deployment.yaml
 
 kubeservice:
 	@echo ":::create service"
-	sudo kubectl apply -f kubernetes/service.yaml
+	kubectl $(KUBE_CLUSTER) apply -f kubernetes/service.yaml
 
 kubeimages: kubedbimage kubebaseimage kubeappimage
 
@@ -145,7 +146,7 @@ kubeinit: kubedbimage kubebaseimage kubeappimage kubedeploy kubeservice
 
 kuberollout:
 	@echo "::: rollout"
-	sudo kubectl rollout restart deployment boilerplate-app-deployment
+	kubectl $(KUBE_CLUSTER) rollout restart deployment boilerplate-app-deployment
 
 kubeup: kubeappimage kubedeploy kubeservice
 
@@ -153,12 +154,12 @@ kubeupdate: kubeappimage kuberollout
 
 kubedown:
 	@echo ":::delete deployment"
-	sudo kubectl delete secret $(APP_NAME)-secrets --ignore-not-found
-	sudo kubectl delete deploy $(APP_NAME)-app-deployment --ignore-not-found
-	sudo kubectl delete service $(APP_NAME)-service --ignore-not-found
+	kubectl $(KUBE_CLUSTER) delete secret $(APP_NAME)-secrets --ignore-not-found
+	kubectl $(KUBE_CLUSTER) delete deploy $(APP_NAME)-app-deployment --ignore-not-found
+	kubectl $(KUBE_CLUSTER) delete service $(APP_NAME)-service --ignore-not-found
 
 kubedns:
-	kubectl run curl --image=radial/busyboxplus:curl -i --tty
+	kubectl $(KUBE_CLUSTER) run curl --image=radial/busyboxplus:curl -i --tty
 
 # kubectl delete service boilerplate-service
 # kubectl delete deploy boilerplate-app-deployment
