@@ -2,6 +2,9 @@ def localDeploy = false
 
 pipeline {
     agent any 
+    environment {
+        KUBECONFIG = '~/.kube/config'
+    }
     stages {
         stage('Build') {
             steps {
@@ -17,11 +20,6 @@ pipeline {
                 // slackSend color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}, refers at: ${env.BUILD_URL}"
                 script {
                     sh "sudo make kubeinit env=local"
-                    // script {
-                    //     app = docker.build("boilerplate-base")
-                    //     docker.withRegistry( "172.16.110.67:5000", "dockerhub" ) {
-                    //     app.push("latest")
-                    // }
                 }
             }
         }
