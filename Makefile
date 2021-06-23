@@ -128,6 +128,7 @@ kubeappimage:
 	docker push $(KUBE_APP_IMAGE)
 
 kubedeploy:
+	export KUBECONFIG=~/.kube/config
 	@echo ":::create secret keys"
 	sudo kubectl delete secret $(APP_NAME)-secrets --ignore-not-found
 	sudo kubectl create secret generic $(APP_NAME)-secrets --from-env-file=environments/.env.kubernetes
