@@ -128,12 +128,13 @@ kubeappimage:
 	docker push $(KUBE_APP_IMAGE)
 
 kubedeploy:
-	@echo ":::Echo pwd"
-	pwd
 	@echo ":::Echo whoami"
 	whoami
 	@echo ":::Echo kubeconfig"
-	cat ~/.kube/config
+	cd ~/.kube
+	@echo ":::Echo pwd"
+	pwd
+	echo ${HOME}
 	kubectl config get-contexts
 	export KUBECONFIG=~/.kube/config
 	@echo ":::create secret keys"
