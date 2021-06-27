@@ -2,6 +2,9 @@ def localDeploy = false
 
 pipeline {
     agent any 
+    environment {
+        KUBECONFIG = '~/.kube/config'
+    }
     stages {
         stage('Build') {
             steps {
@@ -14,9 +17,9 @@ pipeline {
                 expression { CHANGE_TARGET ==~ /init/ }
             }
             steps {
-                slackSend color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}, refers at: ${env.BUILD_URL}"
+                // slackSend color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}, refers at: ${env.BUILD_URL}"
                 script {
-                    make kubeinit env=local
+                    sh "sudo make kubeinit env=local"
                 }
             }
         }
@@ -25,9 +28,9 @@ pipeline {
                 expression { CHANGE_TARGET ==~ /local_deploy/ }
             }
             steps {
-                slackSend color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}, refers at: ${env.BUILD_URL}"
+                // slackSend color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}, refers at: ${env.BUILD_URL}"
                 script {
-                    make kubeupdate env=local
+                    sh "make kubeupdate env=local"
                 }
             }
         }
