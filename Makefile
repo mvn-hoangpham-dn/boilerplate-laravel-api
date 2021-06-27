@@ -127,7 +127,7 @@ kubeappimage:
 	docker build --rm -f dockers/Dockerfile --build-arg IMAGE_NAME=$(KUBE_BASE_IMAGE) --build-arg BASE_TAG=$(BASE_TAG) --build-arg PORT=$(PROXY_PORT) --build-arg ENV=$(ENVIRONMENT) -t $(KUBE_APP_IMAGE):$(BASE_TAG) .
 	docker push $(KUBE_APP_IMAGE)
 	@echo ":::remove untagged images"
-	docker rmi $(docker images -f "dangling=true" -q)
+	docker images -f "dangling=true" -q | xargs -r docker rmi
 
 kubedeploy:
 	@echo ":::create secret keys"
