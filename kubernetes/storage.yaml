@@ -18,7 +18,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/mnt/data/boilerplate"
+    path: "/tmp/data/boilerplate"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
