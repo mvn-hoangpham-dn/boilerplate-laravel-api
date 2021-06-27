@@ -23,6 +23,17 @@ pipeline {
                 }
             }
         }
+        stage('down') {
+            when {
+                expression { CHANGE_TARGET ==~ /down/ }
+            }
+            steps {
+                // slackSend color: "#439FE0", message: "Build Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}, refers at: ${env.BUILD_URL}"
+                script {
+                    sh "sudo make kubedown env=local"
+                }
+            }
+        }
         stage('local-deploy') {
             when {
                 expression { CHANGE_TARGET ==~ /local_deploy/ }

@@ -126,6 +126,8 @@ kubeappimage:
 	@echo ":::build app image"
 	docker build --rm -f dockers/Dockerfile --build-arg IMAGE_NAME=$(KUBE_BASE_IMAGE) --build-arg BASE_TAG=$(BASE_TAG) --build-arg PORT=$(PROXY_PORT) --build-arg ENV=$(ENVIRONMENT) -t $(KUBE_APP_IMAGE):$(BASE_TAG) .
 	docker push $(KUBE_APP_IMAGE)
+	@echo ":::remove untagged images"
+	docker rmi $(docker images -f "dangling=true" -q)
 
 kubedeploy:
 	@echo ":::create secret keys"
@@ -157,9 +159,3 @@ kubedown:
 	sudo kubectl delete secret $(APP_NAME)-secrets --ignore-not-found
 	sudo kubectl delete deploy $(APP_NAME)-app-deployment --ignore-not-found
 	sudo kubectl delete service $(APP_NAME)-service --ignore-not-found
-
-kubedns:
-	kubectl run curl --image=radial/busyboxplus:curl -i --tty
-
-# kubectl delete service boilerplate-service
-# kubectl delete deploy boilerplate-app-deployment
