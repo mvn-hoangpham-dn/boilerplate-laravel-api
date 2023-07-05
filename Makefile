@@ -44,11 +44,10 @@ ifdef env
 endif
 
 #Docker Image Version
-# php 8.0, nginx 1.19.7
-#Docker Image Version
-PHP_TAG=phpdockerio/php73-fpm:latest
+# php 7.3, nginx 1.19.7, mysql 8.0.24
+PHP_TAG=php:7.3-fpm-buster
 HTTPD_TAG=nginx:1.19.7-alpine
-DB_TAG=mysql:8.0.24
+DB_TAG=mysql:8.0.29-debian
 
 # Wokdir
 WORK_DIR=/var/www/
@@ -67,11 +66,11 @@ all-images: base-image db-image
 #Building base php image
 base-image:
 	@echo ":::Building Base Image"
-	docker build --rm -f dockers/Base.Dockerfile $(BUILD_BASE_ARGS) -t $(BASE_IMAGE_NAME):$(BASE_TAG) .
+	docker build --rm -f dockers/Base.Dockerfile $(BUILD_BASE_ARGS) -t $(BASE_IMAGE_NAME):$(BASE_TAG) . --no-cache
 
 db-image:
 	echo ":::Building db image"
-	docker build --rm -f dockers/DB.Dockerfile --platform=linux/x86_64 $(BUILD_DB_ARGS) -t $(DB_IMAGE_NAME) .
+	docker build --rm -f dockers/DB.Dockerfile --platform=linux/x86_64 $(BUILD_DB_ARGS) -t $(DB_IMAGE_NAME) . --no-cache 
 #Remove all images
 rm-all-images:
 	@echo ":::remove all images"

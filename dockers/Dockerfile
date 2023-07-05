@@ -7,15 +7,19 @@ ARG PORT
 
 WORKDIR /var/www
 
-COPY --chown=www-data:www-data . ./
+COPY . ./
 
-ADD --chown=www-data:www-data ./dockers/start.sh /
+ADD ./dockers/start.sh /
 
-ADD --chown=www-data:www-data ./nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+RUN rm -f /etc/nginx/sites-enabled/default
 
-ADD --chown=www-data:www-data ./supervisor/conf.d/laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
-# ADD --chown=www-data:www-data ./php-fpm/www.conf /etc/php/8.0/fpm/pool.d/www.conf
+ADD ./nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+
+ADD ./supervisor/conf.d/laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
+
+COPY package* ./
 
 RUN chmod +x /start.sh
 
