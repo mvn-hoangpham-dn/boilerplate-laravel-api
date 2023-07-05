@@ -44,7 +44,7 @@ ifdef env
 endif
 
 #Docker Image Version
-# php 7.3, nginx 1.19.7, mysql 8.0.24
+# php 7.3, nginx 1.19.7, mysql 8.0.29-debian
 PHP_TAG=php:7.3-fpm-buster
 HTTPD_TAG=nginx:1.19.7-alpine
 DB_TAG=mysql:8.0.29-debian
@@ -66,11 +66,11 @@ all-images: base-image db-image
 #Building base php image
 base-image:
 	@echo ":::Building Base Image"
-	docker build --rm -f dockers/Base.Dockerfile $(BUILD_BASE_ARGS) -t $(BASE_IMAGE_NAME):$(BASE_TAG) . --no-cache
+	docker build --rm -f dockers/Base.Dockerfile $(BUILD_BASE_ARGS) -t $(BASE_IMAGE_NAME):$(BASE_TAG) .
 
 db-image:
 	echo ":::Building db image"
-	docker build --rm -f dockers/DB.Dockerfile --platform=linux/x86_64 $(BUILD_DB_ARGS) -t $(DB_IMAGE_NAME) . --no-cache 
+	docker build --rm -f dockers/DB.Dockerfile --platform=linux/x86_64 $(BUILD_DB_ARGS) -t $(DB_IMAGE_NAME) .
 #Remove all images
 rm-all-images:
 	@echo ":::remove all images"

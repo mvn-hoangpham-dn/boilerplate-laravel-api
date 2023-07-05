@@ -13,8 +13,6 @@ ADD ./dockers/start.sh /
 
 RUN rm -f /etc/nginx/sites-enabled/default
 
-COPY nginx/nginx.conf /etc/nginx/nginx.conf
-
 ADD ./nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
 
 ADD ./supervisor/conf.d/laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
