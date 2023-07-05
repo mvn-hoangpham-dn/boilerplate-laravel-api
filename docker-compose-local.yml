@@ -28,7 +28,7 @@ services:
       - ./nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
       - ./supervisor/conf.d/laravel-worker.conf:/etc/supervisor/conf.d/laravel-worker.conf
       # To avoid syncing the vendor directory
-      - php_dependencies:/var/www/vendor
+      # - php_dependencies:/var/www/vendor
     environment:
       COMPOSER_ALLOW_SUPERUSER: 1
     ports:
