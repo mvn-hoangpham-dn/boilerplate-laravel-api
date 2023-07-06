@@ -15,6 +15,9 @@ RUN rm -f /etc/nginx/sites-enabled/default
 
 ADD ./nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
 
+# Config PHP.ini
+COPY ./php/php.ini /usr/local/etc/php/php.ini
+
 ADD ./supervisor/conf.d/laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
 
 COPY package* ./
