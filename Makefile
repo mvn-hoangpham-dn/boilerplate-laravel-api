@@ -44,11 +44,10 @@ ifdef env
 endif
 
 #Docker Image Version
-# php 8.0, nginx 1.19.7
-#Docker Image Version
-PHP_TAG=phpdockerio/php73-fpm:latest
+# php 7.3, nginx 1.19.7, mysql 8.0.29-debian
+PHP_TAG=php:7.3-fpm-buster
 HTTPD_TAG=nginx:1.19.7-alpine
-DB_TAG=mysql:8.0.24
+DB_TAG=mysql:8.0.29-debian
 
 # Wokdir
 WORK_DIR=/var/www/

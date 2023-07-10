@@ -1,6 +1,6 @@
 #Image creation
 #ARGS expected
-#phpdockerio/php80-fpm:latest
+#php:7.3-fpm-buster
 ARG PHP_TAG
 ARG HTTPD_TAG
 
@@ -10,16 +10,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 
 WORKDIR /var/www/
 
-# Install selected extensions and other stuff
-RUN apt-get update && apt-get install -y php7.3-mysql php7.3-gd \
-    && apt-get install -y php-pear \
-    && apt-get install -y libmcrypt-dev \
-    && apt-get install -y supervisor \
-    && pecl install mcrypt-1.0.1 \
-    && docker-php-ext-enable mcrypt \
-    && apt-get install -y php-bcmath \
-    && docker-php-ext-configure bcmath --enable-bcmath \
-    && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+# Install extension
+RUN apt-get update && apt-get install git libzip-dev libonig-dev libpq-dev zip npm -y \
+    && docker-php-ext-install mysqli pdo pdo_mysql && docker-php-ext-enable pdo_mysql \
+    && docker-php-ext-install zip \
+    && apt-get install -y vim \
+    && apt-get install -y awscli \
+    && apt-get install -y cron \
+    && apt-get install -y wget \
+    && apt-get install -y curl \
+    && apt-get install -y supervisor
+
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install header modules
 FROM ${HTTPD_TAG} as builder
@@ -32,7 +35,7 @@ RUN wget "http://nginx.org/download/nginx-1.19.7.tar.gz" -O nginx.tar.gz && \
     wget "https://github.com/openresty/headers-more-nginx-module/archive/v0.33.tar.gz" -O extra_module.tar.gz
 
 # For latest build deps, see https://github.com/nginxinc/docker-nginx/blob/master/mainline/alpine/Dockerfile
-RUN  apk add --no-cache --virtual .build-deps \
+RUN apk add --no-cache --virtual .build-deps \
     gcc \
     libc-dev \
     make \
@@ -66,21 +69,16 @@ RUN CONFARGS=$(nginx -V 2>&1 | sed -n -e 's/^.*arguments: //p') && \
 # nginx:1.19.7-alpine
 FROM ${HTTPD_TAG}
 
-COPY --from=app ./ .
+COPY --from=app ./ ./temp
+RUN rm -rf ./temp/var/lib/buildkit/
+RUN cp -r ./temp/* . || true && rm -rf ./temp
 
+# Create nginx user/group first, to be consistent throughout Docker variants
 RUN addgroup --system nginx \
     && adduser --system --disabled-login --ingroup nginx --no-create-home --home /nonexistent --gecos "nginx user" --shell /bin/false nginx
 
-RUN sed -i \
-    -e "s/user = www-data/user = nginx/g" \
-    -e "s/group = www-data/group = nginx/g" \
-    -e "s/;listen.mode = 0660/listen.mode = 0666/g" \
-    -e "s/;listen.owner = www-data/listen.owner = nginx/g" \
-    -e "s/;listen.group = www-data/listen.group = nginx/g" \
-    -e "s/listen = \/run\/php\/php7.3-fpm.sock/listen = 127.0.0.1:9000/g" \
-    -e "s/;listen.allowed_clients = 127.0.0.1/listen.allowed_clients = 127.0.0.1/g" \
-    -e "s/^;clear_env = no$/clear_env = no/" \
-    /etc/php/7.3/fpm/pool.d/www.conf
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get install -y nodejs && apt-get clean
 
 COPY --from=builder /usr/src/nginx/nginx-1.19.7/objs/*_module.so /etc/nginx/modules/
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
