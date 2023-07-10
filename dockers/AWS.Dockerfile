@@ -1,12 +1,10 @@
 #Image creation
 #ARGS expected
 #nginx:1.19.9
-ARG HTTPD_TAG
 #php:8.0-fpm-buster
-ARG PHP_TAG
 
 # Stage 1: Build PHP application
-FROM ${PHP_TAG} AS app
+FROM php:8.0-fpm-buster AS app
 
 WORKDIR /var/www/
 # # Copy PHP application files to container
@@ -41,7 +39,7 @@ RUN apt-get update \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Stage 2: Build Nginx server
-FROM ${HTTPD_TAG} AS builder
+FROM nginx:1.19.9 AS builder
 
 # Copy PHP application files from previous stage
 COPY --from=app ./ .
@@ -62,7 +60,7 @@ RUN sed -i \
     /usr/local/etc/php-fpm.d/www.conf
 
 # Config PHP.ini
-COPY --from=app /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+COPY --from=app /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
 RUN sed -i \
     # -e "s/;extension=pdo_mysql/extension=pdo_mysql/g" \
@@ -74,3 +72,25 @@ RUN sed -i \
 # Copy Nginx configuration file to container
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/conf.d /etc/nginx/conf.d/
+
+FROM builder
+
+WORKDIR /var/www
+
+COPY --chown=nginx:nginx . ./
+ADD --chown=nginx:nginx ./dockers/start.sh /
+ADD --chown=nginx:nginx ./nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
+ADD --chown=nginx:nginx ./supervisor/conf.d/laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
+
+RUN chown -R $USER:www-data storage bootstrap/cache
+# RUN chmod -R 777 storage bootstrap/cache
+
+RUN chmod +x /start.sh
+
+RUN chown -R nginx:nginx /var/www/storage/
+RUN composer self-update --2
+RUN composer install --no-scripts
+
+EXPOSE 80
+# ENTRYPOINT [ "/start.sh" ]
+CMD [ "/start.sh" ]

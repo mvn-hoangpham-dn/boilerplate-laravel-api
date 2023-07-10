@@ -11,6 +11,7 @@ COPY --chown=www-data:www-data . ./
 
 ADD --chown=www-data:www-data ./dockers/start.sh /
 
+ADD --chown=www-data:www-data ./nginx/nginx.conf /etc/nginx/nginx.conf
 ADD --chown=www-data:www-data ./nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
 
 ADD --chown=www-data:www-data ./supervisor/conf.d/laravel-worker.conf /etc/supervisor/conf.d/laravel-worker.conf
